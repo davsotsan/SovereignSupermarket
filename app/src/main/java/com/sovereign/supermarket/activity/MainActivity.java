@@ -1,7 +1,9 @@
-package com.sovereign.supermarket;
+package com.sovereign.supermarket.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.sovereign.supermarket.R;
 
 public class MainActivity extends AppCompatActivity {
 
