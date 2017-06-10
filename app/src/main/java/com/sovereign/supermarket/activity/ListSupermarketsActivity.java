@@ -9,6 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -40,27 +41,7 @@ public class ListSupermarketsActivity extends AppCompatActivity {
         supermarketsNearby = new ArrayList<>();
         supermarketRecyclerAdapter = new SupermarketRecyclerAdapter(supermarketsNearby);
         Bundle bundle = this.getIntent().getExtras();
-        String addressSearched = bundle.getString("addressSearched");
-
-        // Se obtienen las coordenadas de la ubicación introducida
-        double latitudeAddressAux = 0.;
-        double longitudeAddressAux = 0.;
-        if (Geocoder.isPresent()) {
-            try {
-                Geocoder gc = new Geocoder(this);
-                List<Address> addresses = gc.getFromLocationName(addressSearched, 1);
-                Address address = addresses.get(0);
-                System.out.println(address.getAddressLine(0));
-                System.out.println(address.getAddressLine(1));
-                latitudeAddressAux = address.getLatitude();
-                longitudeAddressAux = address.getLongitude();
-            } catch (IOException e) {
-                Log.e(TAGLOG, "No se ha obtenido ninguna dirección", e);
-            }
-        }
-        final double latitudeAddress = latitudeAddressAux;
-        final double longitudeAddress = longitudeAddressAux;
-
+        final LatLng coordAddressSearched = bundle.getParcelable("coordAddressSearched");
 
         // Se inicializa la RecyclerView
         RecyclerView recView = (RecyclerView) findViewById(R.id.listSupermarket);
@@ -80,7 +61,7 @@ public class ListSupermarketsActivity extends AppCompatActivity {
                     String dbLon = d.child("info").child("location").child("longitude").getValue().toString();
                     float[] results = new float[1];
 
-                    Location.distanceBetween(latitudeAddress, longitudeAddress, Double.valueOf(dbLat), Double.valueOf(dbLon), results);
+                    Location.distanceBetween(coordAddressSearched.latitude, coordAddressSearched.longitude, Double.valueOf(dbLat), Double.valueOf(dbLon), results);
                     float distance = results[0] / (float) 1E3;
                     // Si la distancia es menor a 1km se añade a la lista de supermercados cercanos y se le notifica al adaptador
                     if (distance < 1.) {
