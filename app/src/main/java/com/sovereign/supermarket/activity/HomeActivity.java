@@ -20,6 +20,7 @@ import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.model.LatLng;
 import com.sovereign.supermarket.R;
+import com.sovereign.supermarket.model.Supermarket;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,12 +41,15 @@ public class HomeActivity extends AppCompatActivity {
     private Button buttonSearch;
     private LatLng coordAddressSearched;
 
+    private Button buttonTest; //Temporal
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
         buttonSearch = (Button) findViewById(R.id.btnSearch);
+        buttonTest = (Button) findViewById(R.id.btnTest);
 
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
@@ -85,6 +89,15 @@ public class HomeActivity extends AppCompatActivity {
                 } else {
                     startActivity(intent);
                 }
+            }
+        });
+
+        buttonTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(HomeActivity.this, SupermarketActivity.class);
+                startActivity(intent);
+
             }
         });
 
