@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.sovereign.supermarket.fragment.SupermarketHomeFragment;
+import com.sovereign.supermarket.fragment.SupermarketHomeFragment2;
 
 public class SupermarketFragmentPagerAdapter extends FragmentPagerAdapter {
 
@@ -25,12 +26,16 @@ public class SupermarketFragmentPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-
         Fragment f = null;
-
-        f = SupermarketHomeFragment.newInstance(numero_mesa);
-
-//        f = SupermarketHomeFragment.newInstance(tabTitles[position].toLowerCase(), numero_mesa);
+        switch(position) {
+            case 0:
+                f = SupermarketHomeFragment.newInstance(numero_mesa);
+                break;
+            case 1:
+            case 2:
+                f = SupermarketHomeFragment2.newInstance(numero_mesa);
+                break;
+        }
 
         return f;
     }

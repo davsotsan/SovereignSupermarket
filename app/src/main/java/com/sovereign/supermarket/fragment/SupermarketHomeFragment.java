@@ -22,6 +22,7 @@ public class SupermarketHomeFragment extends Fragment {
 
     private DatabaseReference dbInfo;
     private ValueEventListener eventListenerInfo;
+    private View viewFragment;
     private String keySupermarket;
     private TextView lblName;
     private TextView lblAddress;
@@ -54,7 +55,7 @@ public class SupermarketHomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View viewFragment = inflater.inflate(R.layout.fragment_supermarket_info, container, false);
+        viewFragment = inflater.inflate(R.layout.fragment_supermarket_info, container, false);
 
         lblName = (TextView) viewFragment.findViewById(R.id.lblName);
         lblAddress = (TextView) viewFragment.findViewById(R.id.lblAddress);
