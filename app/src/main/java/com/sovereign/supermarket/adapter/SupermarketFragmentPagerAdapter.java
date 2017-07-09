@@ -5,18 +5,18 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.sovereign.supermarket.fragment.SupermarketHomeFragment;
-import com.sovereign.supermarket.fragment.SupermarketHomeFragment2;
+import com.sovereign.supermarket.fragment.SupermarketProductsFragment;
 
 public class SupermarketFragmentPagerAdapter extends FragmentPagerAdapter {
 
-    private String numero_mesa;
+    private String keySupermarket;
     private String tabTitles[] =
-            new String[] { "Intro", "List of items", "Shopping Cart"};
+            new String[] { "INFORMATION", "OUR PRODUCTS", "REVIEWS"};
     final int PAGE_COUNT = tabTitles.length;
 
-    public SupermarketFragmentPagerAdapter(FragmentManager fm, String numero_mesa) {
+    public SupermarketFragmentPagerAdapter(FragmentManager fm, String keySupermarket) {
         super(fm);
-        this.numero_mesa = numero_mesa;
+        this.keySupermarket = keySupermarket;
     }
 
     @Override
@@ -29,11 +29,11 @@ public class SupermarketFragmentPagerAdapter extends FragmentPagerAdapter {
         Fragment f = null;
         switch(position) {
             case 0:
-                f = SupermarketHomeFragment.newInstance(numero_mesa);
+            case 2:
+                f = SupermarketHomeFragment.newInstance(keySupermarket);
                 break;
             case 1:
-            case 2:
-                f = SupermarketHomeFragment2.newInstance(numero_mesa);
+                f = SupermarketProductsFragment.newInstance(keySupermarket, null);
                 break;
         }
 

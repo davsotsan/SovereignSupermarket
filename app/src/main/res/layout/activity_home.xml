@@ -82,5 +82,14 @@
         android:layout_marginTop="29dp"
         android:id="@+id/btnTest" />
 
+    <Button
+        android:text="Ir a la pantalla de Sign In"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnTest"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="29dp"
+        android:id="@+id/btnTestLogin" />
+
 
 </RelativeLayout>

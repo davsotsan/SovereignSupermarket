@@ -8,7 +8,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.AutocompleteFilter;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -22,93 +29,85 @@ import org.jetbrains.annotations.NotNull;
  * Created by JoseV on 7/7/17.
  */
 
-public class HomeActivity extends AppCompatActivity implements View.OnClickListener{
-    Button buttonRegister, buttonSignIn;
-    EditText editTextEmail, editTextPass;
+public class HomeActivity extends AppCompatActivity{
 
-    FirebaseAuth.AuthStateListener mAuthListener;
+    private static final String TAG = "HomeActivity";
+
+    private Button buttonSearch;
+    private LatLng coordAddressSearched;
+
+    private Button buttonTest; //Temporal
+    private Button buttonTestLogin; //Temporal
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_secondary);
+        setContentView(R.layout.activity_home);
 
-        buttonRegister=(Button) findViewById(R.id.register_button);
-        buttonSignIn=(Button) findViewById(R.id.signin_button);
-        editTextEmail=(EditText) findViewById(R.id.login_email);
-        editTextPass=(EditText) findViewById(R.id.login_password);
+        buttonSearch = (Button) findViewById(R.id.btnSearch);
+        buttonTest = (Button) findViewById(R.id.btnTest);
+        buttonTestLogin = (Button) findViewById(R.id.btnTestLogin);
 
-        buttonRegister.setOnClickListener(this);
-        buttonSignIn.setOnClickListener(this);
+        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
-        mAuthListener = new FirebaseAuth.AuthStateListener(){
+        autocompleteFragment.setHint(getString(R.string.searchHint));
+
+        autocompleteFragment.setFilter(new AutocompleteFilter.Builder()
+                .setTypeFilter(AutocompleteFilter.TYPE_FILTER_ADDRESS)
+                .build());
+
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
-            public void onAuthStateChanged(@NotNull FirebaseAuth firebaseAuth){
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if(user!=null){
-                    Log.i("SESION", "sesion iniciada con email"+ user.getEmail());
-
-                }else{
-                    Log.i("SESION", "sesion cerrada");
-                }
+            public void onPlaceSelected(Place place) {
+                // TODO: Get info about the selected place.
+                Log.i(TAG, "Place: " + place.getName());
+                coordAddressSearched = place.getLatLng();
             }
 
-        };
-
-
-    }
-
-
-    private void registrar(String email, String pass){
-        FirebaseAuth.getInstance().createUserWithEmailAndPassword(email,pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()){
-                    Log.i("SESION", "usuario creado correctamente");
-                }else{
-                    Log.e("SESION", task.getException().getMessage()+"");
+            public void onError(Status status) {
+                // TODO: Handle the error.
+                Log.i(TAG, "An error occurred: " + status);
+            }
+        });
+
+        buttonSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(HomeActivity.this, ListSupermarketsActivity.class);
+                Bundle b = new Bundle();
+
+                b.putParcelable("coordAddressSearched", coordAddressSearched);
+                intent.putExtras(b);
+
+                if (coordAddressSearched == null) {
+                    Toast.makeText(getBaseContext(), R.string.emptySearch, Toast.LENGTH_SHORT).show();
+                } else {
+                    startActivity(intent);
                 }
             }
         });
+
+        buttonTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(HomeActivity.this, SupermarketActivity.class);
+                startActivity(intent);
+
+            }
+        });
+
+        buttonTestLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(HomeActivity.this, EmailPasswordActivity.class);
+                startActivity(intent);
+
+            }
+        });
+
     }
-
-    private void iniciarSesion(String email, String pass){
-        FirebaseAuth.getInstance().signInWithEmailAndPassword(email,pass);
-
-    }
-
-    @Override
-    public void onClick(View view){
-        switch(view.getId()){
-            case R.id.signin_button:
-                String emailInicio =  editTextEmail.getText().toString();
-                String passInicio =  editTextPass.getText().toString();
-                iniciarSesion(emailInicio,passInicio);
-                Intent intent = new Intent(HomeActivity.this, SignIn.class);
-                break;
-            case R.id.register_button:
-                String emailReg =  editTextEmail.getText().toString();
-                String passReg =  editTextPass.getText().toString();
-                registrar(emailReg,passReg);
-                break;
-        }
-    }
-
-    @Override
-    protected void onStart(){
-        super.onStart();
-        FirebaseAuth.getInstance().addAuthStateListener(mAuthListener);
-    }
-
-    @Override
-    protected void onStop(){
-        super.onStop();
-        if(mAuthListener!=null){
-            FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
-        }
-    }
-
-
 }
 
 

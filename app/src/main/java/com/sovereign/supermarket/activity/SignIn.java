@@ -2,6 +2,7 @@ package com.sovereign.supermarket.activity;
 
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -19,6 +20,11 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.sovereign.supermarket.R;
 import com.sovereign.supermarket.model.Supermarket;
 
@@ -35,76 +41,96 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 
 
-public class SignIn extends AppCompatActivity {
+public class SignIn extends AppCompatActivity implements View.OnClickListener{
     private static final String TAG = "HomeActivity";
 
-    private Button buttonSearch;
-    private LatLng coordAddressSearched;
 
-    private Button buttonTest; //Temporal
+    Button buttonRegister, buttonSignIn;
+    EditText editTextEmail, editTextPass;
+
+    private FirebaseAuth.AuthStateListener mAuthListener;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_secondary);
 
-        buttonSearch = (Button) findViewById(R.id.btnSearch);
-        buttonTest = (Button) findViewById(R.id.btnTest);
+        buttonRegister = (Button) findViewById(R.id.register_button);
+        buttonSignIn = (Button) findViewById(R.id.signin_button);
+        editTextEmail = (EditText) findViewById(R.id.login_email);
+        editTextPass = (EditText) findViewById(R.id.login_password);
 
-        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
-                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+        buttonRegister.setOnClickListener(this);
+        buttonSignIn.setOnClickListener(this);
 
-        autocompleteFragment.setHint(getString(R.string.searchHint));
+        mAuth = FirebaseAuth.getInstance();
 
-        autocompleteFragment.setFilter(new AutocompleteFilter.Builder()
-                .setTypeFilter(AutocompleteFilter.TYPE_FILTER_ADDRESS)
-                .build());
-
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
-            public void onPlaceSelected(Place place) {
-                // TODO: Get info about the selected place.
-                Log.i(TAG, "Place: " + place.getName());
-                coordAddressSearched = place.getLatLng();
-            }
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    Log.i("SESION", "sesion iniciada con email" + user.getEmail());
 
-            @Override
-            public void onError(Status status) {
-                // TODO: Handle the error.
-                Log.i(TAG, "An error occurred: " + status);
-            }
-        });
-
-        buttonSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(SignIn.this, ListSupermarketsActivity.class);
-                Bundle b = new Bundle();
-
-                b.putParcelable("coordAddressSearched", coordAddressSearched);
-                intent.putExtras(b);
-
-                if (coordAddressSearched == null) {
-                    Toast.makeText(getBaseContext(), R.string.emptySearch, Toast.LENGTH_SHORT).show();
                 } else {
-                    startActivity(intent);
+                    Log.i("SESION", "sesion cerrada");
                 }
             }
-        });
 
-        buttonTest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(SignIn.this, SupermarketActivity.class);
-                startActivity(intent);
+        };
 
-            }
-        });
 
     }
 
 
+    private void registrar(String email, String pass) {
+        FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    Log.i("SESION", "usuario creado correctamente");
+                } else {
+                    Log.e("SESION", task.getException().getMessage() + "");
+                }
+            }
+        });
+    }
 
+    private void iniciarSesion(String email, String pass) {
+        FirebaseAuth.getInstance().signInWithEmailAndPassword(email, pass);
+
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.signin_button:
+                String emailInicio = editTextEmail.getText().toString();
+                String passInicio = editTextPass.getText().toString();
+                iniciarSesion(emailInicio, passInicio);
+                break;
+            case R.id.register_button:
+                String emailReg = editTextEmail.getText().toString();
+                String passReg = editTextPass.getText().toString();
+                registrar(emailReg, passReg);
+                break;
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
+    }
 
 }
 

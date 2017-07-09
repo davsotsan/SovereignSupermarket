@@ -24,4 +24,5 @@ public class SupermarketHolder extends RecyclerView.ViewHolder{
         TextView field = (TextView) mView.findViewById(R.id.lblLocation);
         field.setText(location);
     }
+
 }

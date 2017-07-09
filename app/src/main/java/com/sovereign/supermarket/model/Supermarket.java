@@ -1,5 +1,7 @@
 package com.sovereign.supermarket.model;
 
+import java.util.List;
+
 /**
  * Created by David on 07/06/2017.
  */
@@ -40,12 +42,13 @@ public class Supermarket {
         this.latitude = latitude;
     }
 
+
     @Override
     public String toString() {
         return "Supermarket{" +
                 "name='" + name + '\'' +
                 ", latitude='" + latitude + '\'' +
-                ", longitude='" + longitude + '\'' +
+                ", longitude='" + longitude +
                 '}';
     }
 }
